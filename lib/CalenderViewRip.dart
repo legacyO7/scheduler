@@ -223,11 +223,13 @@ class _DayViewExampleState extends State<DayViewExample> {
   _onTapDown(TapDownDetails details) {
     var x = details.globalPosition.dx;
     var y = details.globalPosition.dy;
+    double width = x;
+    print("Resourse number= ${(width / 630).floor()}");
     //print("tap down " + x.toString() + ", " + y.toString());
     // print("Vertical scroll offset = ${_mycontroller1.offset}" );
     // double minutes = (y + _mycontroller1.offset - 184) / 1.5;
     // print("Minutes of day = $minutes");
-  //  print("Event Day index = ${((x + _mycontroller3.offset - 64) / 140 % userIds.length).round()}");
+    //  print("Event Day index = ${((x + _mycontroller3.offset - 64) / 140 % userIds.length).round()}");
   }
 
   _onTapUp(TapUpDetails details) {
@@ -445,140 +447,140 @@ class _DayViewExampleState extends State<DayViewExample> {
         left: _y,
         width: itemSize.width,
         height: itemSize.height,
-        child:
-        Container(child:
-        Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Flexible(
-              flex: 0,
-              child: GestureDetector(
-                  onTap: (){
-                    print("SWIPE TOP TAP");
-
-                  },
-                  onVerticalDragUpdate: (details){
-
-                    if (details.delta.dy < 0) {
-                      print("swipe top up");
-                      setState(() {
-                        event.startMinuteOfDay= event.startMinuteOfDay-30;
-                        event.duration=event.duration+30;
-                      });
-                    }
-                    else
-                    {
-                      print("swipe top down");
-                      if(event.duration>30)
-                      setState(() {
-                        event.startMinuteOfDay= event.startMinuteOfDay+30;
-                        event.duration=event.duration-30;
-                      });
-                    }
-                  },
-                  child: Container(
-                    height: 10,
-                    width: itemSize.width,
-                    color: Colors.green,
-                  )),
-            ),
-            Expanded(
-              child: GestureDetector(
-                  onLongPress: () {
-                    showAlertDialog(context, event.startMinuteOfDay, event.title, event.duration, index, resID);
-                  },
-                  child: Container(
-                    child: Draggable(
-                      child: Container(
-                          padding: EdgeInsets.all(3),
-                          color: Colors.red[200],
-                          margin: EdgeInsets.all(1),
-                          child: Text(("${event.title}"))),
-                      feedback: Container(
-                        height: itemSize.height,
-                        width: itemSize.width,
-                        padding: EdgeInsets.all(3),
-                        color: Colors.red[200],
-                        margin: EdgeInsets.all(1),
-                      ),
-                      childWhenDragging: Container(),
-                      onDragEnd: (dragDetails) {
-                        setState(() {
-                          _x = dragDetails.offset.dx;
-                          //   _y = dragDetails.offset.dy+appBar.preferredSize.height+MediaQuery.of(context).padding.top;
-                          _y = dragDetails.offset.dy;
-
-                          if (dragDetails.velocity.pixelsPerSecond.dy < 0) {
-                            print("UP");
-                            if (event.startMinuteOfDay - round((_y).round()) > 0) {
-                              event.startMinuteOfDay = event.startMinuteOfDay - round((_y).round());
-                              horizontalAction(event, dragDetails, index);
-                            } else
-                              print("NOP");
-                          } else {
-                            print("Down");
-                            if (event.startMinuteOfDay + round((_y).round()) < 1381) {
-                              event.startMinuteOfDay = event.startMinuteOfDay + round((_y).round());
-                              //  print(event.startMinuteOfDay.toString() + "after");
-                              horizontalAction(event, dragDetails, index);
-                            }
-                          }
-                        });
-                      },
-                    ),
-                  )),
-              flex: 1,
-            ),
-            Expanded(
-              flex: 0,
-              child:
-            Draggable(child:   GestureDetector(
-              onTap: (){
-                print("swipe bottom tap");
-              },
-                onVerticalDragUpdate: (details){
-                print(details.delta.dx);
-                  if (details.delta.dy < 0) {
-                    print("swipe top up");
-                    if(event.duration>30)
-                    setState(() {
-                      event.duration=event.duration-30;
-                    });
-                  }
-                  else
-                  {
-                    print("swipe top down");
-                    setState(() {
-                      event.duration=event.duration+30;
-                    });
-                  }
+        child: Container(
+            child: GestureDetector(
+                onLongPress: () {
+                  showAlertDialog(context, event.startMinuteOfDay, event.title, event.duration, index, resID);
                 },
                 child: Container(
-                  padding: EdgeInsets.only(bottom: 10),
-                  width: itemSize.width,
-                  color: Colors.green,
-                )),feedback: Container(),)
-            ),
-          ],
-        ),));
+                  child: Draggable(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Flexible(
+                          flex: 0,
+                          child: GestureDetector(
+                              onTap: () {
+                                print("SWIPE TOP TAP");
+                              },
+                              onVerticalDragUpdate: (details) {
+                                if (details.delta.dy < 0) {
+                                  print("swipe top up");
+                                  setState(() {
+                                    event.startMinuteOfDay = event.startMinuteOfDay - 30;
+                                    event.duration = event.duration + 30;
+                                  });
+                                } else {
+                                  print("swipe top down");
+                                  if (event.duration > 30)
+                                    setState(() {
+                                      event.startMinuteOfDay = event.startMinuteOfDay + 30;
+                                      event.duration = event.duration - 30;
+                                    });
+                                }
+                              },
+                              child: Container(
+                                height: 10,
+                                width: itemSize.width,
+                                color: Colors.green,
+                              )),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                              onLongPress: () {
+                                showAlertDialog(
+                                    context, event.startMinuteOfDay, event.title, event.duration, index, resID);
+                              },
+                              child:
+                              Container(
+                                  padding: EdgeInsets.all(3),
+                                  color: Colors.red[200],
+                                  margin: EdgeInsets.all(1),
+                                  child: Text(("${event.title}")))),
+                          flex: 1,
+                        ),
+                        Expanded(
+                            flex: 0,
+                            child: Draggable(
+                              child: GestureDetector(
+                                  onTap: () {
+                                    print("swipe bottom tap");
+                                  },
+                                  onVerticalDragUpdate: (details) {
+                                    print(details.delta.dx);
+                                    if (details.delta.dy < 0) {
+                                      print("swipe top up");
+                                      if (event.duration > 30)
+                                        setState(() {
+                                          event.duration = event.duration - 30;
+                                        });
+                                    } else {
+                                      print("swipe top down");
+                                      setState(() {
+                                        event.duration = event.duration + 30;
+                                      });
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.only(bottom: 10),
+                                    width: itemSize.width,
+                                    color: Colors.green,
+                                  )),
+                              feedback: Container(),
+                            )),
+                      ],
+                    ),
+                    feedback: Container(
+                      height: itemSize.height,
+                      width: itemSize.width,
+                      padding: EdgeInsets.all(3),
+                      color: Colors.red[200],
+                      margin: EdgeInsets.all(1),
+                    ),
+                    childWhenDragging: Container(),
+                    onDragEnd: (dragDetails) {
+                      setState(() {
+                        _x = dragDetails.offset.dx;
+                        //   _y = dragDetails.offset.dy+appBar.preferredSize.height+MediaQuery.of(context).padding.top;
+                        _y = dragDetails.offset.dy;
+
+                        if (dragDetails.velocity.pixelsPerSecond.direction < 1) {
+                          print("UP");
+                          if (event.startMinuteOfDay - round((_y).floor()) > 0) {
+                            event.startMinuteOfDay = event.startMinuteOfDay - round((_y).floor());
+                            horizontalAction(event, dragDetails, index);
+                          } else
+                            print("NOP ${event.startMinuteOfDay} - ${round((_y).floor())} - $_y");
+                        } else {
+                          print("Down");
+                          if (event.startMinuteOfDay + round((_y).floor()) < 1381) {
+                            event.startMinuteOfDay = event.startMinuteOfDay + round((_y).floor());
+                            //  print(event.startMinuteOfDay.toString() + "after");
+                            horizontalAction(event, dragDetails, index);
+                          }
+                        }
+                      });
+                    },
+                  ),
+                ))));
   }
 }
 
 void horizontalAction(Event event, DraggableDetails dragDetails, int index) {
-  print(dragDetails.velocity.pixelsPerSecond.dx);
-  if (dragDetails.velocity.pixelsPerSecond.dx > 100) {
+  print(dragDetails.offset.direction);
+  if (dragDetails.offset.direction < 1) {
     print("Right");
-    if (dragDetails.offset.dx / 100 > DayViewWidths().daySeparationAreaWidth / 2) {
+    if (dragDetails.offset.dx > 500) {
       eventsOfDay1
           .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
       eventsOfDay0.removeAt(index);
     }
   } else if (dragDetails.velocity.pixelsPerSecond.dx < -40) {
     print("left");
-    print("${dragDetails.offset.dx / 100} > ${DayViewWidths().daySeparationAreaWidth / 2}");
-    if (dragDetails.offset.dx / 100 > DayViewWidths().daySeparationAreaWidth) {
+    print("${dragDetails.offset.dx} > ${DayViewWidths().daySeparationAreaWidth / 2}");
+    if (dragDetails.offset.dx < 100) {
       eventsOfDay0
           .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
       eventsOfDay1.removeAt(index);
@@ -649,11 +651,11 @@ class SyncScrollController {
 int round(int tnum) {
   int num = (tnum / 3).round();
   int temp = num % 60;
-  // print(num.toString() + "is drag");
+  print(num.toString() + "is drag");
   //print(temp.toString() + "is modulus");
   //print((num - temp).toString() + "is offset");
-  if (temp < 15)
+  if (temp < 40)
     return (num - temp);
   else
-    return num + 60 - temp;
+    return num - temp;
 }

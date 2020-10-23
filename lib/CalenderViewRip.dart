@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
 import 'package:calendar_views/day_view.dart';
 import 'package:flutter_calendar/flutter_calendar.dart';
@@ -226,7 +227,7 @@ class _DayViewExampleState extends State<DayViewExample> {
     // print("Vertical scroll offset = ${_mycontroller1.offset}" );
     // double minutes = (y + _mycontroller1.offset - 184) / 1.5;
     // print("Minutes of day = $minutes");
-    print("Event Day index = ${((x + _mycontroller3.offset - 64) / 140 % userIds.length).round()}");
+  //  print("Event Day index = ${((x + _mycontroller3.offset - 64) / 140 % userIds.length).round()}");
   }
 
   _onTapUp(TapUpDetails details) {
@@ -440,55 +441,128 @@ class _DayViewExampleState extends State<DayViewExample> {
     double _x = itemPosition.top, _y = itemPosition.left;
 
     return new Positioned(
-      top: _x,
-      left: _y,
-      width: itemSize.width,
-      height: itemSize.height,
-      child: GestureDetector(
-          onLongPress: () {
-            showAlertDialog(context, event.startMinuteOfDay, event.title, event.duration, index, resID);
-          },
-          child: Container(
-            child: Draggable(
-              child: Container(
-                  padding: EdgeInsets.all(3),
-                  color: Colors.red[200],
-                  margin: EdgeInsets.all(1),
-                  child: Text(("${event.title}"))),
-              feedback: Container(
-                height: itemSize.height,
-                width: itemSize.width,
-                padding: EdgeInsets.all(3),
-                color: Colors.red[200],
-                margin: EdgeInsets.all(1),
-              ),
-              childWhenDragging: Container(),
-              onDragEnd: (dragDetails) {
-                setState(() {
-                  _x = dragDetails.offset.dx;
-                  //   _y = dragDetails.offset.dy+appBar.preferredSize.height+MediaQuery.of(context).padding.top;
-                  _y = dragDetails.offset.dy;
+        top: _x,
+        left: _y,
+        width: itemSize.width,
+        height: itemSize.height,
+        child:
+        Container(child:
+        Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Flexible(
+              flex: 0,
+              child: GestureDetector(
+                  onTap: (){
+                    print("SWIPE TOP TAP");
 
-                  if (dragDetails.velocity.pixelsPerSecond.dy < 0) {
-                    print("UP");
-                    if (event.startMinuteOfDay - round((_y).round()) > 0) {
-                      event.startMinuteOfDay = event.startMinuteOfDay - round((_y).round());
-                      horizontalAction(event, dragDetails, index);
-                    } else
-                      print("NOP");
-                  } else {
-                    print("Down");
-                    if (event.startMinuteOfDay + round((_y).round()) < 1381) {
-                      event.startMinuteOfDay = event.startMinuteOfDay + round((_y).round());
-                      //  print(event.startMinuteOfDay.toString() + "after");
-                      horizontalAction(event, dragDetails, index);
+                  },
+                  onVerticalDragUpdate: (details){
+
+                    if (details.delta.dy < 0) {
+                      print("swipe top up");
+                      setState(() {
+                        event.startMinuteOfDay= event.startMinuteOfDay-30;
+                        event.duration=event.duration+30;
+                      });
                     }
-                  }
-                });
-              },
+                    else
+                    {
+                      print("swipe top down");
+                      if(event.duration>30)
+                      setState(() {
+                        event.startMinuteOfDay= event.startMinuteOfDay+30;
+                        event.duration=event.duration-30;
+                      });
+                    }
+                  },
+                  child: Container(
+                    height: 10,
+                    width: itemSize.width,
+                    color: Colors.green,
+                  )),
             ),
-          )),
-    );
+            Expanded(
+              child: GestureDetector(
+                  onLongPress: () {
+                    showAlertDialog(context, event.startMinuteOfDay, event.title, event.duration, index, resID);
+                  },
+                  child: Container(
+                    child: Draggable(
+                      child: Container(
+                          padding: EdgeInsets.all(3),
+                          color: Colors.red[200],
+                          margin: EdgeInsets.all(1),
+                          child: Text(("${event.title}"))),
+                      feedback: Container(
+                        height: itemSize.height,
+                        width: itemSize.width,
+                        padding: EdgeInsets.all(3),
+                        color: Colors.red[200],
+                        margin: EdgeInsets.all(1),
+                      ),
+                      childWhenDragging: Container(),
+                      onDragEnd: (dragDetails) {
+                        setState(() {
+                          _x = dragDetails.offset.dx;
+                          //   _y = dragDetails.offset.dy+appBar.preferredSize.height+MediaQuery.of(context).padding.top;
+                          _y = dragDetails.offset.dy;
+
+                          if (dragDetails.velocity.pixelsPerSecond.dy < 0) {
+                            print("UP");
+                            if (event.startMinuteOfDay - round((_y).round()) > 0) {
+                              event.startMinuteOfDay = event.startMinuteOfDay - round((_y).round());
+                              horizontalAction(event, dragDetails, index);
+                            } else
+                              print("NOP");
+                          } else {
+                            print("Down");
+                            if (event.startMinuteOfDay + round((_y).round()) < 1381) {
+                              event.startMinuteOfDay = event.startMinuteOfDay + round((_y).round());
+                              //  print(event.startMinuteOfDay.toString() + "after");
+                              horizontalAction(event, dragDetails, index);
+                            }
+                          }
+                        });
+                      },
+                    ),
+                  )),
+              flex: 1,
+            ),
+            Expanded(
+              flex: 0,
+              child:
+            Draggable(child:   GestureDetector(
+              onTap: (){
+                print("swipe bottom tap");
+              },
+                onVerticalDragUpdate: (details){
+                print(details.delta.dx);
+                  if (details.delta.dy < 0) {
+                    print("swipe top up");
+                    if(event.duration>30)
+                    setState(() {
+                      event.duration=event.duration-30;
+                    });
+                  }
+                  else
+                  {
+                    print("swipe top down");
+                    setState(() {
+                      event.duration=event.duration+30;
+                    });
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.only(bottom: 10),
+                  width: itemSize.width,
+                  color: Colors.green,
+                )),feedback: Container(),)
+            ),
+          ],
+        ),));
   }
 }
 

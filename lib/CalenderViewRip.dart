@@ -272,40 +272,14 @@ class _DayViewExampleState extends State<DayViewExample> {
           properties: new DayViewProperties(days: dayList),
           child: Row(
             children: <Widget>[
-              NotificationListener<ScrollNotification>(
-                child: SizedBox(
-                  width: 60.0,
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 30.0, child: Container()),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          controller: _mycontroller2,
-                          child: new DayViewSchedule(
-                              topExtensionHeight: 1,
-                              heightPerMinute: 1,
-                              components: <ScheduleComponent>[
-                                new TimeIndicationComponent.intervalGenerated(
-                                  generatedTimeIndicatorBuilder: _generatedTimeIndicatorBuilder,
-                                ),
-                              ]),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                onNotification: (ScrollNotification scrollInfo) {
-                  _syncScroller.processNotification(scrollInfo, _mycontroller2);
-                },
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width - 80,
+
+              Expanded(
+
                 child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    controller: _mycontroller3,
+
                     child: Column(
                       children: <Widget>[
-                        //Flex(direction: Axis.vertical, children: <Widget>[
 
                         NotificationListener<ScrollNotification>(
                             child: Expanded(
@@ -316,11 +290,14 @@ class _DayViewExampleState extends State<DayViewExample> {
                                   behavior: HitTestBehavior.translucent,
                                   onTap: () => print("tapped"),
                                   onTapDown: (TapDownDetails details) => _onTapDown(details),
-                                  onTapUp: (TapUpDetails details) => _onTapUp(details),
+                               //   onTapUp: (TapUpDetails details) => _onTapUp(details),
                                   child: DayViewSchedule(
                                     heightPerMinute: 1,
                                     topExtensionHeight: 0,
                                     components: <ScheduleComponent>[
+                                      new TimeIndicationComponent.intervalGenerated(
+                                        generatedTimeIndicatorBuilder: _generatedTimeIndicatorBuilder,
+                                      ),
                                       new SupportLineComponent.intervalGenerated(
                                         generatedSupportLineBuilder: _generatedSupportLineBuilder,
                                       ),
@@ -335,9 +312,7 @@ class _DayViewExampleState extends State<DayViewExample> {
                                 ),
                               ),
                             ),
-                            onNotification: (ScrollNotification scrollInfo) {
-                              _syncScroller.processNotification(scrollInfo, _mycontroller1);
-                            })
+                        )
                       ],
                     )),
               ),
@@ -379,7 +354,7 @@ class _DayViewExampleState extends State<DayViewExample> {
     return new Positioned(
       top: itemPosition.top,
       left: itemPosition.left,
-      width: itemSize.width + 60,
+      width: itemSize.width ,
       height: itemSize.height,
       child: new Container(
         child: new Center(
@@ -398,16 +373,21 @@ class _DayViewExampleState extends State<DayViewExample> {
     double itemWidth,
     int minuteOfDay,
   ) {
+    int resID=0;
     return Positioned(
         top: itemPosition.top,
         left: itemPosition.left,
-        width: itemWidth * 2,
+        width: itemWidth,
+
         child: DragTarget(
           builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
             return GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, 0)},
-              onTapUp: _onTapUp,
+              onTapDown: (details){
+                var x = details.globalPosition.dx;
+                print("Resourse number= ${(x/370)}");
+              },
               child: Container(
                 padding: EdgeInsets.only(bottom: 60),
                 color: Colors.green[100],
@@ -612,7 +592,7 @@ void directionHandler(double dragDirection, x, y) {
 
 void horizontalAction(Event event, DraggableDetails dragDetails, int index, ItemPosition itemPosition) {
   print(dragDetails.offset.dx - itemPosition.left);
-  if (dragDetails.offset.dx - itemPosition.left > 300) {
+  if (dragDetails.offset.dx - itemPosition.left > 200) {
     print("Right");
     if (dragDetails.offset.dx - itemPosition.left > 200) {
       eventsOfDay1
@@ -621,7 +601,7 @@ void horizontalAction(Event event, DraggableDetails dragDetails, int index, Item
     }
   } else {
     print("left");
-    if (dragDetails.offset.dx - itemPosition.left < -300) {
+    if (dragDetails.offset.dx - itemPosition.left < -200) {
       eventsOfDay0
           .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
       eventsOfDay1.removeAt(index);

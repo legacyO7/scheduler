@@ -18,18 +18,15 @@ class Event {
   String title;
 }
 
-List<List> EventList = <List>[eventsOfDay0, eventsOfDay1];
+int resID=0;
 
-
-List<Event> eventsOfDay0 = <Event>[
+List<List> EventList = <List>[ <Event>[
   new Event(startMinuteOfDay: 0, duration: 60, title: "Midnight Party", boCompleted: true),
   new Event(startMinuteOfDay: 6 * 60, duration: 2 * 60, title: "Morning Routine"),
   new Event(startMinuteOfDay: 6 * 60, duration: 60, title: "Eat Breakfast"),
   new Event(startMinuteOfDay: 7 * 60, duration: 60, title: "Get Dressed"),
   new Event(startMinuteOfDay: 18 * 60, duration: 60, title: "Take Dog For A Walk"),
-];
-List<String> Resources = ["Resource A", "Resource B"];
-List<Event> eventsOfDay1 = <Event>[
+],  <Event>[
   new Event(startMinuteOfDay: 1 * 60, duration: 90, title: "Sleep Walking"),
   new Event(startMinuteOfDay: 7 * 60, duration: 60, title: "Drive To Work"),
   new Event(startMinuteOfDay: 8 * 60, duration: 20, title: "A"),
@@ -38,7 +35,23 @@ List<Event> eventsOfDay1 = <Event>[
   new Event(startMinuteOfDay: 8 * 60 + 10, duration: 20, title: "D"),
   new Event(startMinuteOfDay: 8 * 60 + 30, duration: 30, title: "E"),
   new Event(startMinuteOfDay: 23 * 60, duration: 60, title: "Midnight Snack"),
+],
+  <Event>[
+    Event(startMinuteOfDay: 10 * 60, duration: 30, title: "Pic Up"),
+    Event(startMinuteOfDay: 12 * 60, duration: 30, title: "Delivery"),
+    Event(startMinuteOfDay: 15 * 60, duration: 30, title: "Delivery"),
+    Event(startMinuteOfDay: 17 * 60, duration: 30, title: "Delivery"),
+  ],
+  <Event>[
+    Event(startMinuteOfDay: 8 * 60+30, duration: 90, title: "Universe through a"),
+    Event(startMinuteOfDay: 15 * 60, duration: 90, title: "Top 3 reasons why"),
+    Event(startMinuteOfDay: 11 * 60, duration: 30, title: "Weekly Groceries"),
+    Event(startMinuteOfDay: 13 * 60, duration: 30, title: "Dealing with "),
+  ]
+
 ];
+
+List<String> Resources =["Resource A", "Resource B", "Resource C", "Resource D"];
 
 class DayViewExample extends StatefulWidget {
   @override
@@ -52,11 +65,6 @@ class _DayViewExampleState extends State<DayViewExample> {
   List<DateTime> dayList;
   List<String> userIds;
 
-  ScrollController _mycontroller1 = new ScrollController(); // make seperate controllers
-  ScrollController _mycontroller2 = new ScrollController(); // for each scrollables
-  ScrollController _mycontroller3 = new ScrollController(); // for each scrollables
-  SyncScrollController _syncScroller;
-
   TextEditingController subjectController = TextEditingController();
   TextEditingController FromTimeController = TextEditingController();
   TextEditingController ToTimeController = TextEditingController();
@@ -64,25 +72,25 @@ class _DayViewExampleState extends State<DayViewExample> {
   @override
   void initState() {
     super.initState();
-    _syncScroller = new SyncScrollController([_mycontroller1, _mycontroller2]);
 
     _day0 = new DateTime.now();
-    _day1 = _day0.toUtc().add(new Duration(days: 1)).toLocal();
-    dayList = [_day0, _day1, _day0, _day0];
-    userIds = ["Resource A", "Resource B", "Resource C", "Resource D"];
+    dayList=[_day0];
+    for(int i=1;i<EventList.length;i++){
+      dayList.add(_day0.toUtc().add(new Duration(days: i)).toLocal());
+    }
+
     startTime = DateTime.now();
   }
 
   void dispose() {
-    _mycontroller1.dispose();
-    _mycontroller2.dispose();
-    _mycontroller3.dispose();
+
     super.dispose();
   }
 
   showAlertDialog(BuildContext context, int minuteoftheDay, String title, int interval, int index, int resID) {
     String subject = title;
-    int fromTime = (minuteoftheDay / 60).round(), toTime = (minuteoftheDay / 60).round() + 1;
+
+    double fromTime = (minuteoftheDay / 60), toTime = (minuteoftheDay / 60) + 1;
     int duration = interval;
 
     FromTimeController.text = (minuteoftheDay / 60).round().toString();
@@ -93,13 +101,15 @@ class _DayViewExampleState extends State<DayViewExample> {
       child: Text("OK"),
       onPressed: () {
         if (subject != "") {
-          if (title != "") {
-            eventsOfDay0[index].title = subject;
-            eventsOfDay0[index].startMinuteOfDay = fromTime * 60;
-            eventsOfDay0[index].duration = (toTime - fromTime) * 60;
-          } else
-            eventsOfDay0
-                .add(new Event(startMinuteOfDay: fromTime * 60, duration: (toTime - fromTime) * 60, title: subject));
+          setState(() {
+            if (title != "") {
+              EventList[resID][index].title = subject;
+              EventList[resID][index].startMinuteOfDay = (fromTime * 60).round();
+              EventList[resID][index].duration = ((toTime - fromTime) * 60).round();
+            } else
+              EventList[resID]
+                  .add(new Event(startMinuteOfDay: (fromTime * 60).round(), duration: ((toTime - fromTime) * 60).round(), title: subject));
+          });
           Navigator.of(context).pop();
         }
       },
@@ -146,7 +156,7 @@ class _DayViewExampleState extends State<DayViewExample> {
                       labelText: 'From',
                     ),
                     onChanged: (text) {
-                      fromTime = int.parse(text);
+                      fromTime = double.parse(text);
                     },
                   ),
                   width: 100,
@@ -169,7 +179,7 @@ class _DayViewExampleState extends State<DayViewExample> {
                     labelText: 'To',
                   ),
                   onChanged: (text) {
-                    toTime = int.parse(text);
+                    toTime = double.parse(text);
                   },
                 ),
                 width: 100,
@@ -204,13 +214,8 @@ class _DayViewExampleState extends State<DayViewExample> {
   List<StartDurationItem> _getEventsOfDay(DateTime day) {
     int resID;
     List<Event> events;
-    if (day.year == _day0.year && day.month == _day0.month && day.day == _day0.day) {
-      resID=0;
-      events = eventsOfDay0;
-    } else {
-      resID=1;
-      events = eventsOfDay1;
-    }
+    resID = day.day - DateTime.now().day;
+    events = EventList[resID];
 
     return events
         .asMap()
@@ -230,12 +235,15 @@ class _DayViewExampleState extends State<DayViewExample> {
     var x = details.globalPosition.dx;
     var y = details.globalPosition.dy;
 
-    print("Resourse number= ${(x / 630).floor()}");
+    print("Resourse number= ${(x /254).floor()}");
+    setState(() {
+      resID=(x /254).floor();
+    });
     //print("tap down " + x.toString() + ", " + y.toString());
     // print("Vertical scroll offset = ${_mycontroller1.offset}" );
     // double minutes = (y + _mycontroller1.offset - 184) / 1.5;
     // print("Minutes of day = $minutes");
-    //  print("Event Day index = ${((x + _mycontroller3.offset - 64) / 140 % userIds.length).round()}");
+   // print("Event Day index = ${((x + _mycontroller3.offset - 64) / 140 % userIds.length).round()}");
   }
 
   _onTapUp(TapUpDetails details) {
@@ -267,64 +275,67 @@ class _DayViewExampleState extends State<DayViewExample> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: appBar,
-      body: new DayViewEssentials(
-          //widths: DayViewWidths(separationAreaWidth: 10,),
-          properties: new DayViewProperties(days: dayList),
-          child: Row(
-            children: <Widget>[
-
-              Expanded(
-
-                child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-
-                    child: Column(
-                      children: <Widget>[
-
-                        NotificationListener<ScrollNotification>(
-                            child: Expanded(
-                              flex: 10,
-                              child: SingleChildScrollView(
-                                controller: _mycontroller1,
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () => print("tapped"),
-                                  onTapDown: (TapDownDetails details) => _onTapDown(details),
-                               //   onTapUp: (TapUpDetails details) => _onTapUp(details),
-                                  child: DayViewSchedule(
-                                    heightPerMinute: 1,
-                                    topExtensionHeight: 0,
-                                    components: <ScheduleComponent>[
-                                      new TimeIndicationComponent.intervalGenerated(
-                                        generatedTimeIndicatorBuilder: _generatedTimeIndicatorBuilder,
+      body:
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child:   Container(
+            width: 1000,
+            child: DayViewEssentials(
+              //widths: DayViewWidths(separationAreaWidth: 10,),
+                properties: new DayViewProperties(days: dayList),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Column(
+                            children: <Widget>[
+                              NotificationListener<ScrollNotification>(
+                                child: Expanded(
+                                  flex: 10,
+                                  child: SingleChildScrollView(
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      onTap: () => print("tapped"),
+                                      onTapDown: (TapDownDetails details) => _onTapDown(details),
+                                      //   onTapUp: (TapUpDetails details) => _onTapUp(details),
+                                      child: DayViewSchedule(
+                                        heightPerMinute: 1,
+                                        topExtensionHeight: 0,
+                                        components: <ScheduleComponent>[
+                                          new TimeIndicationComponent.intervalGenerated(
+                                            generatedTimeIndicatorBuilder: _generatedTimeIndicatorBuilder,
+                                          ),
+                                          new SupportLineComponent.intervalGenerated(
+                                            generatedSupportLineBuilder: _generatedSupportLineBuilder,
+                                          ),
+                                          new DaySeparationComponent(
+                                            generatedDaySeparatorBuilder: _generatedDaySeparatorBuilder,
+                                          ),
+                                          new EventViewComponent(
+                                            getEventsOfDay: _getEventsOfDay,
+                                          ),
+                                        ],
                                       ),
-                                      new SupportLineComponent.intervalGenerated(
-                                        generatedSupportLineBuilder: _generatedSupportLineBuilder,
-                                      ),
-                                      new DaySeparationComponent(
-                                        generatedDaySeparatorBuilder: _generatedDaySeparatorBuilder,
-                                      ),
-                                      new EventViewComponent(
-                                        getEventsOfDay: _getEventsOfDay,
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                        )
-                      ],
-                    )),
-              ),
-            ],
-          )),
+                              )
+                            ],
+                          )),
+                    ),
+                  ],
+                )),
+          ),)
+
+
     );
   }
 
   Widget _getUserOfDay(DateTime day) {
     Widget userName;
     userName = Text(
-      Resources[DateTime.now().day-day.day],
+      Resources[DateTime.now().day - day.day],
       maxLines: 1,
       overflow: TextOverflow.clip,
     );
@@ -354,7 +365,7 @@ class _DayViewExampleState extends State<DayViewExample> {
     return new Positioned(
       top: itemPosition.top,
       left: itemPosition.left,
-      width: itemSize.width ,
+      width: itemSize.width,
       height: itemSize.height,
       child: new Container(
         child: new Center(
@@ -373,21 +384,16 @@ class _DayViewExampleState extends State<DayViewExample> {
     double itemWidth,
     int minuteOfDay,
   ) {
-    int resID=0;
     return Positioned(
         top: itemPosition.top,
         left: itemPosition.left,
         width: itemWidth,
-
         child: DragTarget(
           builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
             return GestureDetector(
               behavior: HitTestBehavior.translucent,
-              onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, 0)},
-              onTapDown: (details){
-                var x = details.globalPosition.dx;
-                print("Resourse number= ${(x/370)}");
-              },
+               onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, resID)},
+            //  onTapDown: _onTapDown,
               child: Container(
                 padding: EdgeInsets.only(bottom: 60),
                 color: Colors.green[100],
@@ -532,7 +538,7 @@ class _DayViewExampleState extends State<DayViewExample> {
                 _x = dragDetails.offset.dx;
                 //   _y = dragDetails.offset.dy+appBar.preferredSize.height+MediaQuery.of(context).padding.top;
                 _y = dragDetails.offset.dy;
-               horizontalAction(event, dragDetails, index,itemPosition);
+                horizontalAction(event, dragDetails, index, itemPosition,resID);
                 // double dragDirection = dragDetails.offset.direction;
                 //  print(dragDirection);
                 //   directionHandler(dragDetails.offset.direction, dragDetails.offset.dx-itemPosition.left,dragDetails.offset.dy-itemPosition.top);
@@ -590,21 +596,34 @@ void directionHandler(double dragDirection, x, y) {
     print("lies at origin");
 }
 
-void horizontalAction(Event event, DraggableDetails dragDetails, int index, ItemPosition itemPosition) {
+void horizontalAction(Event event, DraggableDetails dragDetails, int index, ItemPosition itemPosition, int resID) {
+  int startEventIndex=resID,endEventIndex;
+
   print(dragDetails.offset.dx - itemPosition.left);
   if (dragDetails.offset.dx - itemPosition.left > 200) {
     print("Right");
     if (dragDetails.offset.dx - itemPosition.left > 200) {
-      eventsOfDay1
+
+      endEventIndex=((dragDetails.offset.dx - itemPosition.left)/254).round()+resID;
+
+      print("start $startEventIndex || end $endEventIndex");
+
+
+      EventList[endEventIndex]
           .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
-      eventsOfDay0.removeAt(index);
+      EventList[startEventIndex].removeAt(index);
     }
   } else {
     print("left");
     if (dragDetails.offset.dx - itemPosition.left < -200) {
-      eventsOfDay0
+
+
+      endEventIndex=resID-(((dragDetails.offset.dx - itemPosition.left).abs())/254).round();
+
+      print("start $startEventIndex || end $endEventIndex");
+      EventList[endEventIndex]
           .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
-      eventsOfDay1.removeAt(index);
+      EventList[startEventIndex].removeAt(index);
     }
   }
 }
@@ -632,42 +651,6 @@ Future<ConfirmAction> _asyncConfirmDialog(BuildContext context, String title) as
   );
 }
 
-class SyncScrollController {
-  List<ScrollController> _registeredScrollControllers = new List<ScrollController>();
-
-  ScrollController _scrollingController;
-  bool _scrollingActive = false;
-
-  SyncScrollController(List<ScrollController> controllers) {
-    controllers.forEach((controller) => registerScrollController(controller));
-  }
-
-  void registerScrollController(ScrollController controller) {
-    _registeredScrollControllers.add(controller);
-  }
-
-  void processNotification(ScrollNotification notification, ScrollController sender) {
-    if (notification is ScrollStartNotification && !_scrollingActive) {
-      _scrollingController = sender;
-      _scrollingActive = true;
-      return;
-    }
-
-    if (identical(sender, _scrollingController) && _scrollingActive) {
-      if (notification is ScrollEndNotification) {
-        _scrollingController = null;
-        _scrollingActive = false;
-        return;
-      }
-
-      if (notification is ScrollUpdateNotification) {
-        _registeredScrollControllers.forEach((controller) =>
-            {if (!identical(_scrollingController, controller)) controller..jumpTo(_scrollingController.offset)});
-        return;
-      }
-    }
-  }
-}
 
 int round(double tnum) {
   int num = (tnum / 1).round();

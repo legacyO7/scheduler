@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
 import 'package:calendar_views/day_view.dart';
-import 'package:flutter_calendar/flutter_calendar.dart';
 
 @immutable
 class Event {
@@ -22,6 +19,7 @@ class Event {
 }
 
 List<List> EventList = <List>[eventsOfDay0, eventsOfDay1];
+
 
 List<Event> eventsOfDay0 = <Event>[
   new Event(startMinuteOfDay: 0, duration: 60, title: "Midnight Party", boCompleted: true),
@@ -53,7 +51,7 @@ class _DayViewExampleState extends State<DayViewExample> {
   DateTime startTime;
   List<DateTime> dayList;
   List<String> userIds;
-  int resID;
+
   ScrollController _mycontroller1 = new ScrollController(); // make seperate controllers
   ScrollController _mycontroller2 = new ScrollController(); // for each scrollables
   ScrollController _mycontroller3 = new ScrollController(); // for each scrollables
@@ -82,7 +80,7 @@ class _DayViewExampleState extends State<DayViewExample> {
     super.dispose();
   }
 
-  showAlertDialog(BuildContext context, int minuteoftheDay, String title, int interval, int index, String resID) {
+  showAlertDialog(BuildContext context, int minuteoftheDay, String title, int interval, int index, int resID) {
     String subject = title;
     int fromTime = (minuteoftheDay / 60).round(), toTime = (minuteoftheDay / 60).round() + 1;
     int duration = interval;
@@ -122,7 +120,7 @@ class _DayViewExampleState extends State<DayViewExample> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(resID),
+          Text(Resources[resID]),
           TextField(
             controller: subjectController,
             decoration: InputDecoration(
@@ -203,11 +201,14 @@ class _DayViewExampleState extends State<DayViewExample> {
         "${(minuteOfDay < 60 * 12) ? " AM" : (minuteOfDay == 60 * 24) ? " AM" : " PM"}";
   }
 
-  List<StartDurationItem> _getEventsOfDay(DateTime day, String str) {
+  List<StartDurationItem> _getEventsOfDay(DateTime day) {
+    int resID;
     List<Event> events;
     if (day.year == _day0.year && day.month == _day0.month && day.day == _day0.day) {
+      resID=0;
       events = eventsOfDay0;
     } else {
+      resID=1;
       events = eventsOfDay1;
     }
 
@@ -219,7 +220,7 @@ class _DayViewExampleState extends State<DayViewExample> {
             startMinuteOfDay: event.value.startMinuteOfDay,
             duration: event.value.duration,
             builder: (context, itemPosition, itemSize) =>
-                _eventBuilder(context, itemPosition, itemSize, event.value, event.key, str),
+                _eventBuilder(context, itemPosition, itemSize, event.value, event.key, resID),
           ),
         )
         .toList();
@@ -228,7 +229,7 @@ class _DayViewExampleState extends State<DayViewExample> {
   _onTapDown(TapDownDetails details) {
     var x = details.globalPosition.dx;
     var y = details.globalPosition.dy;
-    resID = (x / 630).floor();
+
     print("Resourse number= ${(x / 630).floor()}");
     //print("tap down " + x.toString() + ", " + y.toString());
     // print("Vertical scroll offset = ${_mycontroller1.offset}" );
@@ -268,7 +269,7 @@ class _DayViewExampleState extends State<DayViewExample> {
       appBar: appBar,
       body: new DayViewEssentials(
           //widths: DayViewWidths(separationAreaWidth: 10,),
-          properties: new DayViewProperties(days: dayList, userIds: userIds),
+          properties: new DayViewProperties(days: dayList),
           child: Row(
             children: <Widget>[
               NotificationListener<ScrollNotification>(
@@ -305,15 +306,7 @@ class _DayViewExampleState extends State<DayViewExample> {
                     child: Column(
                       children: <Widget>[
                         //Flex(direction: Axis.vertical, children: <Widget>[
-                        Flexible(
-                          flex: 1,
-                          child: Container(
-                            color: Colors.grey[200],
-                            child: new DayViewDaysHeader(
-                              headerItemBuilder: _headerItemBuilder,
-                            ),
-                          ),
-                        ),
+
                         NotificationListener<ScrollNotification>(
                             child: Expanded(
                               flex: 10,
@@ -353,24 +346,24 @@ class _DayViewExampleState extends State<DayViewExample> {
     );
   }
 
-  Widget _getUserOfDay(String userId) {
+  Widget _getUserOfDay(DateTime day) {
     Widget userName;
     userName = Text(
-      userId,
+      Resources[DateTime.now().day-day.day],
       maxLines: 1,
       overflow: TextOverflow.clip,
     );
     return userName;
   }
 
-  Widget _headerItemBuilder(BuildContext context, DateTime day, String userId) {
+  Widget _headerItemBuilder(BuildContext context, DateTime day) {
     return new Container(
       color: Colors.grey[300],
       padding: new EdgeInsets.symmetric(vertical: 4.0),
       child: Column(children: <Widget>[
         Flexible(
           flex: 1,
-          child: _getUserOfDay(userId),
+          child: _getUserOfDay(day),
         ),
         // Flexible(flex:3, child:SingleChildScrollView(child:_getListOfAnytimeEvents(day),))
       ]),
@@ -413,7 +406,7 @@ class _DayViewExampleState extends State<DayViewExample> {
           builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
             return GestureDetector(
               behavior: HitTestBehavior.translucent,
-              onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, "0")},
+              onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, 0)},
               onTapUp: _onTapUp,
               child: Container(
                 padding: EdgeInsets.only(bottom: 60),
@@ -431,7 +424,6 @@ class _DayViewExampleState extends State<DayViewExample> {
           onAccept: (Event event) {
             print("OA");
             print(event.title);
-            print(resID);
             event.startMinuteOfDay = minuteOfDay;
           },
         ));
@@ -458,7 +450,7 @@ class _DayViewExampleState extends State<DayViewExample> {
   }
 
   Positioned _eventBuilder(
-      BuildContext context, ItemPosition itemPosition, ItemSize itemSize, Event event, int index, String resID) {
+      BuildContext context, ItemPosition itemPosition, ItemSize itemSize, Event event, int index, int resID) {
     double _x = itemPosition.top, _y = itemPosition.left;
 
     return new Positioned(
@@ -628,7 +620,7 @@ void horizontalAction(Event event, DraggableDetails dragDetails, int index, Item
       eventsOfDay0.removeAt(index);
     }
   } else {
-
+    print("left");
     if (dragDetails.offset.dx - itemPosition.left < -300) {
       eventsOfDay0
           .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));

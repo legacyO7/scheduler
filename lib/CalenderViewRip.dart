@@ -227,10 +227,11 @@ class _DayViewExampleState extends State<DayViewExample> {
   }
 
   _onTapDown(TapDownDetails details) {
-    var x = details.globalPosition.dx;
-    print("Resourse number= ${(x / 254).floor()}");
+    var x = details.localPosition.dx;
+    print("Resourse number= ${(x / 1)}");
+    print("Resourse number= ${((details.localPosition.dx-60) / 230)}");
     setState(() {
-      resID = (x / 254).floor();
+      resID = ((x-(DayViewEssentials().widths.timeIndicationAreaWidth+DayViewEssentials().widths.mainAreaStartPadding)) / 230).floor();
     });
   }
 
@@ -247,7 +248,7 @@ class _DayViewExampleState extends State<DayViewExample> {
           child: Container(
             width: ((eventList.length) * 250.0),
             child: DayViewEssentials(
-                //widths: DayViewWidths(separationAreaWidth: 10,),
+                widths: DayViewWidths(totalAreaStartPadding: 0),
                 properties: new DayViewProperties(days: dayList),
                 child: Row(
                   children: <Widget>[
@@ -255,10 +256,11 @@ class _DayViewExampleState extends State<DayViewExample> {
                       child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Container(
                                 child: DayViewDaysHeader(
-                   headerItemBuilder: _headerItemBuilder,
+                                  headerItemBuilder: _headerItemBuilder,
                                 ),
                               ),
                               NotificationListener<ScrollNotification>(
@@ -271,7 +273,6 @@ class _DayViewExampleState extends State<DayViewExample> {
                                       onTapDown: (TapDownDetails details) => _onTapDown(details),
                                       child: DayViewSchedule(
                                         heightPerMinute: 1,
-                                        topExtensionHeight: 0,
                                         components: <ScheduleComponent>[
                                           new TimeIndicationComponent.intervalGenerated(
                                             generatedTimeIndicatorBuilder: _generatedTimeIndicatorBuilder,
@@ -317,9 +318,7 @@ class _DayViewExampleState extends State<DayViewExample> {
   Widget _getUserOfDay(DateTime day) {
     Widget userName;
     userName = Text(
-      resources[day.day-DateTime
-          .now()
-          .day ],
+      resources[day.day - DateTime.now().day],
       maxLines: 1,
       overflow: TextOverflow.clip,
     );
@@ -362,7 +361,9 @@ class _DayViewExampleState extends State<DayViewExample> {
           width: itemWidth,
           height: 60,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
               Expanded(
                   flex: 0,
                   child: new Container(
@@ -373,6 +374,7 @@ class _DayViewExampleState extends State<DayViewExample> {
                 flex: 1,
                 child: DragTarget(
                   builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
+                    print(itemWidth);
                     return GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, resID)},
@@ -553,7 +555,7 @@ void horizontalAction(Event event, DraggableDetails dragDetails, int index, Item
   if (dragDetails.offset.dx - itemPosition.left > 200) {
     print("Right");
     if (dragDetails.offset.dx - itemPosition.left > 200) {
-      newEventIndex = ((dragDetails.offset.dx - itemPosition.left) / 254).round() + resID;
+      newEventIndex = ((dragDetails.offset.dx - itemPosition.left) / 230).round() + resID;
 
       if (newEventIndex >= eventList.length) newEventIndex = eventList.length - 1;
 
@@ -566,7 +568,7 @@ void horizontalAction(Event event, DraggableDetails dragDetails, int index, Item
   } else {
     if (dragDetails.offset.dx - itemPosition.left < -200) {
       print("left");
-      newEventIndex = resID - (((dragDetails.offset.dx - itemPosition.left).abs()) / 254).round();
+      newEventIndex = resID - (((dragDetails.offset.dx - itemPosition.left).abs()) / 230).round();
 
       if (newEventIndex < 0) newEventIndex = 0;
 

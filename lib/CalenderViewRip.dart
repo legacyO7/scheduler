@@ -18,7 +18,7 @@ class Event {
   String title;
 }
 
-int resID=0;
+int resID = 0;
 
 List<List> EventList = <List>[ <Event>[
   new Event(startMinuteOfDay: 0, duration: 60, title: "Midnight Party", boCompleted: true),
@@ -26,7 +26,7 @@ List<List> EventList = <List>[ <Event>[
   new Event(startMinuteOfDay: 6 * 60, duration: 60, title: "Eat Breakfast"),
   new Event(startMinuteOfDay: 7 * 60, duration: 60, title: "Get Dressed"),
   new Event(startMinuteOfDay: 18 * 60, duration: 60, title: "Take Dog For A Walk"),
-],  <Event>[
+], <Event>[
   new Event(startMinuteOfDay: 1 * 60, duration: 90, title: "Sleep Walking"),
   new Event(startMinuteOfDay: 7 * 60, duration: 60, title: "Drive To Work"),
   new Event(startMinuteOfDay: 8 * 60, duration: 20, title: "A"),
@@ -43,7 +43,7 @@ List<List> EventList = <List>[ <Event>[
     Event(startMinuteOfDay: 17 * 60, duration: 30, title: "Delivery"),
   ],
   <Event>[
-    Event(startMinuteOfDay: 8 * 60+30, duration: 90, title: "Universe through a"),
+    Event(startMinuteOfDay: 8 * 60 + 30, duration: 90, title: "Universe through a"),
     Event(startMinuteOfDay: 15 * 60, duration: 90, title: "Top 3 reasons why"),
     Event(startMinuteOfDay: 11 * 60, duration: 30, title: "Weekly Groceries"),
     Event(startMinuteOfDay: 13 * 60, duration: 30, title: "Dealing with "),
@@ -51,7 +51,7 @@ List<List> EventList = <List>[ <Event>[
 
 ];
 
-List<String> Resources =["Resource A", "Resource B", "Resource C", "Resource D"];
+List<String> Resources = ["Resource A", "Resource B", "Resource C", "Resource D"];
 
 class DayViewExample extends StatefulWidget {
   @override
@@ -74,8 +74,8 @@ class _DayViewExampleState extends State<DayViewExample> {
     super.initState();
 
     _day0 = new DateTime.now();
-    dayList=[_day0];
-    for(int i=1;i<EventList.length;i++){
+    dayList = [_day0];
+    for (int i = 1; i < EventList.length; i++) {
       dayList.add(_day0.toUtc().add(new Duration(days: i)).toLocal());
     }
 
@@ -83,18 +83,18 @@ class _DayViewExampleState extends State<DayViewExample> {
   }
 
   void dispose() {
-
     super.dispose();
   }
 
   showAlertDialog(BuildContext context, int minuteoftheDay, String title, int interval, int index, int resID) {
     String subject = title;
 
-    double fromTime = (minuteoftheDay / 60), toTime = (minuteoftheDay / 60) + 1;
+    double fromTime = (minuteoftheDay / 60),
+        toTime = (minuteoftheDay / 60) + 1;
     int duration = interval;
 
-    FromTimeController.text = (minuteoftheDay / 60).round().toString();
-    ToTimeController.text = ((minuteoftheDay / 60).round() + duration ~/ 60).toString();
+    FromTimeController.text = (minuteoftheDay / 60).toString();
+    ToTimeController.text = ((minuteoftheDay / 60) + duration/ 60).toString();
     subjectController.text = subject;
 
     Widget okButton = FlatButton(
@@ -108,7 +108,9 @@ class _DayViewExampleState extends State<DayViewExample> {
               EventList[resID][index].duration = ((toTime - fromTime) * 60).round();
             } else
               EventList[resID]
-                  .add(new Event(startMinuteOfDay: (fromTime * 60).round(), duration: ((toTime - fromTime) * 60).round(), title: subject));
+                  .add(new Event(startMinuteOfDay: (fromTime * 60).round(),
+                  duration: ((toTime - fromTime) * 60).round(),
+                  title: subject));
           });
           Navigator.of(context).pop();
         }
@@ -122,7 +124,6 @@ class _DayViewExampleState extends State<DayViewExample> {
       },
     );
 
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text("Add"),
       content: Column(
@@ -207,27 +208,32 @@ class _DayViewExampleState extends State<DayViewExample> {
   }
 
   String _minuteOfDayToHourMinuteAmPmString(int minuteOfDay) {
-    return "${((minuteOfDay < 60) ? (minuteOfDay ~/ 60 + 12) : (minuteOfDay <= 60 * 12) ? (minuteOfDay ~/ 60) : (minuteOfDay ~/ 60 - 12)).toString()}"
+    return "${((minuteOfDay < 60) ? (minuteOfDay ~/ 60 + 12) : (minuteOfDay <= 60 * 12)
+        ? (minuteOfDay ~/ 60)
+        : (minuteOfDay ~/ 60 - 12)).toString()}"
         "${(minuteOfDay < 60 * 12) ? " AM" : (minuteOfDay == 60 * 24) ? " AM" : " PM"}";
   }
 
   List<StartDurationItem> _getEventsOfDay(DateTime day) {
     int resID;
     List<Event> events;
-    resID = day.day - DateTime.now().day;
+    resID = day.day - DateTime
+        .now()
+        .day;
     events = EventList[resID];
 
     return events
         .asMap()
         .entries
         .map(
-          (event) => new StartDurationItem(
-            startMinuteOfDay: event.value.startMinuteOfDay,
-            duration: event.value.duration,
-            builder: (context, itemPosition, itemSize) =>
-                _eventBuilder(context, itemPosition, itemSize, event.value, event.key, resID),
-          ),
-        )
+          (event) =>
+      new StartDurationItem(
+        startMinuteOfDay: event.value.startMinuteOfDay,
+        duration: event.value.duration,
+        builder: (context, itemPosition, itemSize) =>
+            _eventBuilder(context, itemPosition, itemSize, event.value, event.key, resID),
+      ),
+    )
         .toList();
   }
 
@@ -235,15 +241,15 @@ class _DayViewExampleState extends State<DayViewExample> {
     var x = details.globalPosition.dx;
     var y = details.globalPosition.dy;
 
-    print("Resourse number= ${(x /254).floor()}");
+    print("Resourse number= ${(x / 254).floor()}");
     setState(() {
-      resID=(x /254).floor();
+      resID = (x / 254).floor();
     });
     //print("tap down " + x.toString() + ", " + y.toString());
     // print("Vertical scroll offset = ${_mycontroller1.offset}" );
     // double minutes = (y + _mycontroller1.offset - 184) / 1.5;
     // print("Minutes of day = $minutes");
-   // print("Event Day index = ${((x + _mycontroller3.offset - 64) / 140 % userIds.length).round()}");
+    // print("Event Day index = ${((x + _mycontroller3.offset - 64) / 140 % userIds.length).round()}");
   }
 
   _onTapUp(TapUpDetails details) {
@@ -274,12 +280,12 @@ class _DayViewExampleState extends State<DayViewExample> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: appBar,
-      body:
+        appBar: appBar,
+        body:
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child:   Container(
-            width: 1000,
+          child: Container(
+            width: ((EventList.length)*250.0),
             child: DayViewEssentials(
               //widths: DayViewWidths(separationAreaWidth: 10,),
                 properties: new DayViewProperties(days: dayList),
@@ -335,7 +341,9 @@ class _DayViewExampleState extends State<DayViewExample> {
   Widget _getUserOfDay(DateTime day) {
     Widget userName;
     userName = Text(
-      Resources[DateTime.now().day - day.day],
+      Resources[DateTime
+          .now()
+          .day - day.day],
       maxLines: 1,
       overflow: TextOverflow.clip,
     );
@@ -356,12 +364,10 @@ class _DayViewExampleState extends State<DayViewExample> {
     );
   }
 
-  Positioned _generatedTimeIndicatorBuilder(
-    BuildContext context,
-    ItemPosition itemPosition,
-    ItemSize itemSize,
-    int minuteOfDay,
-  ) {
+  Positioned _generatedTimeIndicatorBuilder(BuildContext context,
+      ItemPosition itemPosition,
+      ItemSize itemSize,
+      int minuteOfDay,) {
     return new Positioned(
       top: itemPosition.top,
       left: itemPosition.left,
@@ -378,49 +384,80 @@ class _DayViewExampleState extends State<DayViewExample> {
     );
   }
 
-  Positioned _generatedSupportLineBuilder(
-    BuildContext context,
-    ItemPosition itemPosition,
-    double itemWidth,
-    int minuteOfDay,
-  ) {
+  Positioned _generatedSupportLineBuilder(BuildContext context,
+      ItemPosition itemPosition,
+      double itemWidth,
+      int minuteOfDay,) {
     return Positioned(
         top: itemPosition.top,
         left: itemPosition.left,
         width: itemWidth,
-        child: DragTarget(
-          builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
-            return GestureDetector(
-              behavior: HitTestBehavior.translucent,
-               onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, resID)},
-            //  onTapDown: _onTapDown,
-              child: Container(
-                padding: EdgeInsets.only(bottom: 60),
-                color: Colors.green[100],
-                child: new Container(
-                  height: 0.7,
-                  color: (minuteOfDay % 60 == 0) ? Colors.grey[700] : Colors.grey[400],
-                ),
+        child:
+
+        Container(width: itemWidth, height: 60, child: Column(
+          children: [
+            Expanded(flex: 0, child: new Container(
+              height: 0.7,
+              color: (minuteOfDay % 60 == 0) ? Colors.grey[700] : Colors.grey[400],
+            )),
+            Expanded(
+              flex: 1,
+              child: DragTarget(
+                builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
+                  return GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, resID)},
+                    //  onTapDown: _onTapDown,
+                    child: Container(
+                        padding: EdgeInsets.only(bottom: 30),
+                        color: Colors.blue[100],
+
+                    ),
+                  );
+                },
+                onWillAccept: (data) {
+                  return true;
+                },
+                onAccept: (Event event) {
+                  print("OA");
+                  print(event.title);
+                  event.startMinuteOfDay = minuteOfDay;
+                },
               ),
-            );
-          },
-          onWillAccept: (data) {
-            return true;
-          },
-          onAccept: (Event event) {
-            print("OA");
-            print(event.title);
-            event.startMinuteOfDay = minuteOfDay;
-          },
-        ));
+            ),
+            Expanded(
+              flex: 1,
+              child: DragTarget(
+                builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
+                  return GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, resID)},
+                    //  onTapDown: _onTapDown,
+                    child: Container(
+                      padding: EdgeInsets.only(bottom: 30),
+                      color: Colors.green[100],
+
+                    ),
+                  );
+                },
+                onWillAccept: (data) {
+                  return true;
+                },
+                onAccept: (Event event) {
+                  print("OA");
+                  print(event.title);
+                  event.startMinuteOfDay = minuteOfDay+30;
+                },
+              ),
+            )
+          ],
+        ),));
   }
 
-  Positioned _generatedDaySeparatorBuilder(
-    BuildContext context,
-    ItemPosition itemPosition,
-    ItemSize itemSize,
-    int daySeparatorNumber,
-  ) {
+  Positioned _generatedDaySeparatorBuilder(BuildContext context,
+      ItemPosition itemPosition,
+      ItemSize itemSize,
+      int daySeparatorNumber,) {
     return new Positioned(
       top: itemPosition.top,
       left: itemPosition.left,
@@ -435,9 +472,10 @@ class _DayViewExampleState extends State<DayViewExample> {
     );
   }
 
-  Positioned _eventBuilder(
-      BuildContext context, ItemPosition itemPosition, ItemSize itemSize, Event event, int index, int resID) {
-    double _x = itemPosition.top, _y = itemPosition.left;
+  Positioned _eventBuilder(BuildContext context, ItemPosition itemPosition, ItemSize itemSize, Event event, int index,
+      int resID) {
+    double _x = itemPosition.top,
+        _y = itemPosition.left;
 
     return new Positioned(
         top: _x,
@@ -538,7 +576,7 @@ class _DayViewExampleState extends State<DayViewExample> {
                 _x = dragDetails.offset.dx;
                 //   _y = dragDetails.offset.dy+appBar.preferredSize.height+MediaQuery.of(context).padding.top;
                 _y = dragDetails.offset.dy;
-                horizontalAction(event, dragDetails, index, itemPosition,resID);
+                horizontalAction(event, dragDetails, index, itemPosition, resID);
                 // double dragDirection = dragDetails.offset.direction;
                 //  print(dragDirection);
                 //   directionHandler(dragDetails.offset.direction, dragDetails.offset.dx-itemPosition.left,dragDetails.offset.dy-itemPosition.top);
@@ -597,17 +635,19 @@ void directionHandler(double dragDirection, x, y) {
 }
 
 void horizontalAction(Event event, DraggableDetails dragDetails, int index, ItemPosition itemPosition, int resID) {
-  int startEventIndex=resID,endEventIndex;
+  int startEventIndex = resID,
+      endEventIndex;
 
   print(dragDetails.offset.dx - itemPosition.left);
   if (dragDetails.offset.dx - itemPosition.left > 200) {
     print("Right");
     if (dragDetails.offset.dx - itemPosition.left > 200) {
+      endEventIndex = ((dragDetails.offset.dx - itemPosition.left) / 254).round() + resID;
 
-      endEventIndex=((dragDetails.offset.dx - itemPosition.left)/254).round()+resID;
+      if(endEventIndex>=EventList.length)
+        endEventIndex=EventList.length-1;
 
       print("start $startEventIndex || end $endEventIndex");
-
 
       EventList[endEventIndex]
           .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
@@ -615,12 +655,14 @@ void horizontalAction(Event event, DraggableDetails dragDetails, int index, Item
     }
   } else {
     print("left");
-    if (dragDetails.offset.dx - itemPosition.left < -200) {
-
-
-      endEventIndex=resID-(((dragDetails.offset.dx - itemPosition.left).abs())/254).round();
+    if (dragDetails.offset.dx - itemPosition.left < -200 ) {
+      endEventIndex = resID - (((dragDetails.offset.dx - itemPosition.left).abs()) / 254).round();
 
       print("start $startEventIndex || end $endEventIndex");
+
+      if(endEventIndex<0)
+        endEventIndex=0;
+
       EventList[endEventIndex]
           .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
       EventList[startEventIndex].removeAt(index);

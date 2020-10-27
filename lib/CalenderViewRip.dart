@@ -256,6 +256,11 @@ class _DayViewExampleState extends State<DayViewExample> {
                           scrollDirection: Axis.horizontal,
                           child: Column(
                             children: <Widget>[
+                              Container(
+                                child: DayViewDaysHeader(
+                   headerItemBuilder: _headerItemBuilder,
+                                ),
+                              ),
                               NotificationListener<ScrollNotification>(
                                 child: Expanded(
                                   flex: 10,
@@ -293,6 +298,32 @@ class _DayViewExampleState extends State<DayViewExample> {
                 )),
           ),
         ));
+  }
+
+  Widget _headerItemBuilder(BuildContext context, DateTime day) {
+    return new Container(
+      color: Colors.grey[300],
+      padding: new EdgeInsets.symmetric(vertical: 4.0),
+      child: Column(children: <Widget>[
+        Flexible(
+          flex: 1,
+          child: _getUserOfDay(day),
+        ),
+        // Flexible(flex:3, child:SingleChildScrollView(child:_getListOfAnytimeEvents(day),))
+      ]),
+    );
+  }
+
+  Widget _getUserOfDay(DateTime day) {
+    Widget userName;
+    userName = Text(
+      resources[day.day-DateTime
+          .now()
+          .day ],
+      maxLines: 1,
+      overflow: TextOverflow.clip,
+    );
+    return userName;
   }
 
   Positioned _generatedTimeIndicatorBuilder(

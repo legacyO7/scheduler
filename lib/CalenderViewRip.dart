@@ -70,6 +70,8 @@ class _DayViewExampleState extends State<DayViewExample> {
   TextEditingController fromTimeController = TextEditingController();
   TextEditingController toTimeController = TextEditingController();
 
+  ScrollController scrollcontroller = new ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -90,7 +92,8 @@ class _DayViewExampleState extends State<DayViewExample> {
   showAlertDialog(BuildContext context, int minuteoftheDay, String title, int interval, int index, int resID) {
     String subject = title;
 
-    double fromTime = (minuteoftheDay / 60), toTime = (minuteoftheDay / 60) + 1;
+    double fromTime = (minuteoftheDay / 60),
+        toTime = (minuteoftheDay / 60) + 1;
     int duration = interval;
 
     fromTimeController.text = (minuteoftheDay / 60).toString();
@@ -209,29 +212,34 @@ class _DayViewExampleState extends State<DayViewExample> {
   List<StartDurationItem> _getEventsOfDay(DateTime day) {
     int resID;
     List<Event> events;
-    resID = day.day - DateTime.now().day;
+    resID = day.day - DateTime
+        .now()
+        .day;
     events = eventList[resID];
 
     return events
         .asMap()
         .entries
         .map(
-          (event) => new StartDurationItem(
-            startMinuteOfDay: event.value.startMinuteOfDay,
-            duration: event.value.duration,
-            builder: (context, itemPosition, itemSize) =>
-                _eventBuilder(context, itemPosition, itemSize, event.value, event.key, resID),
-          ),
-        )
+          (event) =>
+      new StartDurationItem(
+        startMinuteOfDay: event.value.startMinuteOfDay,
+        duration: event.value.duration,
+        builder: (context, itemPosition, itemSize) =>
+            _eventBuilder(context, itemPosition, itemSize, event.value, event.key, resID),
+      ),
+    )
         .toList();
   }
 
   _onTapDown(TapDownDetails details) {
     var x = details.localPosition.dx;
     print("Resourse number= ${(x / 1)}");
-    print("Resourse number= ${((details.localPosition.dx-60) / 230)}");
+    print("Resourse number= ${((details.localPosition.dx - 60) / 230)}");
     setState(() {
-      resID = ((x-(DayViewEssentials().widths.timeIndicationAreaWidth+DayViewEssentials().widths.mainAreaStartPadding)) / 230).floor();
+      resID = ((x -
+          (DayViewEssentials().widths.timeIndicationAreaWidth + DayViewEssentials().widths.mainAreaStartPadding)) / 230)
+          .floor();
     });
   }
 
@@ -243,62 +251,73 @@ class _DayViewExampleState extends State<DayViewExample> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: appBar,
-        body: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Container(
-            width: ((eventList.length) * 250.0),
-            child: DayViewEssentials(
-                widths: DayViewWidths(totalAreaStartPadding: 0),
-                properties: new DayViewProperties(days: dayList),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                child: DayViewDaysHeader(
-                                  headerItemBuilder: _headerItemBuilder,
-                                ),
-                              ),
-                              NotificationListener<ScrollNotification>(
-                                child: Expanded(
-                                  flex: 10,
-                                  child: SingleChildScrollView(
-                                    child: GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      onTap: () => print("tapped"),
-                                      onTapDown: (TapDownDetails details) => _onTapDown(details),
-                                      child: DayViewSchedule(
-                                        heightPerMinute: 1,
-                                        components: <ScheduleComponent>[
-                                          new TimeIndicationComponent.intervalGenerated(
-                                            generatedTimeIndicatorBuilder: _generatedTimeIndicatorBuilder,
-                                          ),
-                                          new SupportLineComponent.intervalGenerated(
-                                            generatedSupportLineBuilder: _generatedSupportLineBuilder,
-                                          ),
-                                          new DaySeparationComponent(
-                                            generatedDaySeparatorBuilder: _generatedDaySeparatorBuilder,
-                                          ),
-                                          new EventViewComponent(
-                                            getEventsOfDay: _getEventsOfDay,
-                                          ),
-                                        ],
-                                      ),
+        body:
+
+
+        Row(mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(width: 240,),
+            Expanded(child:
+            SingleChildScrollView(
+              controller: scrollcontroller,
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                width: ((eventList.length) * 250.0),
+                child: DayViewEssentials(
+                    widths: DayViewWidths(totalAreaStartPadding: 0),
+                    properties: new DayViewProperties(days: dayList),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    child: DayViewDaysHeader(
+                                      headerItemBuilder: _headerItemBuilder,
                                     ),
                                   ),
-                                ),
-                              )
-                            ],
-                          )),
-                    ),
-                  ],
-                )),
-          ),
-        ));
+                                  NotificationListener<ScrollNotification>(
+                                    child: Expanded(
+                                      flex: 10,
+                                      child: SingleChildScrollView(
+                                        child: GestureDetector(
+                                          behavior: HitTestBehavior.translucent,
+                                          onTap: () => print("tapped"),
+                                          onTapDown: (TapDownDetails details) => _onTapDown(details),
+                                          child: DayViewSchedule(
+                                            heightPerMinute: 1,
+                                            components: <ScheduleComponent>[
+                                              new TimeIndicationComponent.intervalGenerated(
+                                                generatedTimeIndicatorBuilder: _generatedTimeIndicatorBuilder,
+                                              ),
+                                              new SupportLineComponent.intervalGenerated(
+                                                generatedSupportLineBuilder: _generatedSupportLineBuilder,
+                                              ),
+                                              new DaySeparationComponent(
+                                                generatedDaySeparatorBuilder: _generatedDaySeparatorBuilder,
+                                              ),
+                                              new EventViewComponent(
+                                                getEventsOfDay: _getEventsOfDay,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )),
+                        ),
+                      ],
+                    )),
+              ),
+            ),)
+
+          ],));
   }
 
   Widget _headerItemBuilder(BuildContext context, DateTime day) {
@@ -318,19 +337,19 @@ class _DayViewExampleState extends State<DayViewExample> {
   Widget _getUserOfDay(DateTime day) {
     Widget userName;
     userName = Text(
-      resources[day.day - DateTime.now().day],
+      resources[day.day - DateTime
+          .now()
+          .day],
       maxLines: 1,
       overflow: TextOverflow.clip,
     );
     return userName;
   }
 
-  Positioned _generatedTimeIndicatorBuilder(
-    BuildContext context,
-    ItemPosition itemPosition,
-    ItemSize itemSize,
-    int minuteOfDay,
-  ) {
+  Positioned _generatedTimeIndicatorBuilder(BuildContext context,
+      ItemPosition itemPosition,
+      ItemSize itemSize,
+      int minuteOfDay,) {
     return new Positioned(
       top: itemPosition.top,
       left: itemPosition.left,
@@ -347,12 +366,10 @@ class _DayViewExampleState extends State<DayViewExample> {
     );
   }
 
-  Positioned _generatedSupportLineBuilder(
-    BuildContext context,
-    ItemPosition itemPosition,
-    double itemWidth,
-    int minuteOfDay,
-  ) {
+  Positioned _generatedSupportLineBuilder(BuildContext context,
+      ItemPosition itemPosition,
+      double itemWidth,
+      int minuteOfDay,) {
     return Positioned(
         top: itemPosition.top,
         left: itemPosition.left,
@@ -374,7 +391,7 @@ class _DayViewExampleState extends State<DayViewExample> {
                 flex: 1,
                 child: DragTarget(
                   builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
-                    print(itemWidth);
+                    // print(itemWidth);
                     return GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onTap: () => {showAlertDialog(context, minuteOfDay, "", 60, 0, resID)},
@@ -424,12 +441,10 @@ class _DayViewExampleState extends State<DayViewExample> {
         ));
   }
 
-  Positioned _generatedDaySeparatorBuilder(
-    BuildContext context,
-    ItemPosition itemPosition,
-    ItemSize itemSize,
-    int daySeparatorNumber,
-  ) {
+  Positioned _generatedDaySeparatorBuilder(BuildContext context,
+      ItemPosition itemPosition,
+      ItemSize itemSize,
+      int daySeparatorNumber,) {
     return new Positioned(
       top: itemPosition.top,
       left: itemPosition.left,
@@ -444,9 +459,10 @@ class _DayViewExampleState extends State<DayViewExample> {
     );
   }
 
-  Positioned _eventBuilder(
-      BuildContext context, ItemPosition itemPosition, ItemSize itemSize, Event event, int index, int resID) {
-    double _x = itemPosition.top, _y = itemPosition.left;
+  Positioned _eventBuilder(BuildContext context, ItemPosition itemPosition, ItemSize itemSize, Event event, int index,
+      int resID) {
+    double _x = itemPosition.top,
+        _y = itemPosition.left;
 
     return new Positioned(
         top: _x,
@@ -546,37 +562,42 @@ class _DayViewExampleState extends State<DayViewExample> {
           ),
         ));
   }
-}
 
-void horizontalAction(Event event, DraggableDetails dragDetails, int index, ItemPosition itemPosition, int resID) {
-  int oldEventIndex = resID, newEventIndex;
 
-  print(dragDetails.offset.dx - itemPosition.left);
-  if (dragDetails.offset.dx - itemPosition.left > 200) {
-    print("Right");
-    if (dragDetails.offset.dx - itemPosition.left > 200) {
-      newEventIndex = ((dragDetails.offset.dx - itemPosition.left) / 230).round() + resID;
+  void horizontalAction(Event event, DraggableDetails dragDetails, int index, ItemPosition itemPosition, int resID) {
+    int oldEventIndex = resID,
+        newEventIndex;
 
-      if (newEventIndex >= eventList.length) newEventIndex = eventList.length - 1;
+    print(dragDetails.offset.dx.toString() + " - " + itemPosition.left.toString());
+    if (dragDetails.offset.dx - itemPosition.left + scrollcontroller.offset > 200) {
+      print("Right");
+      if (dragDetails.offset.dx - itemPosition.left + scrollcontroller.offset > 200) {
+        newEventIndex =
+            ((dragDetails.offset.dx - 240 - itemPosition.left + scrollcontroller.offset) / 230).round() + resID;
 
-      print("start $oldEventIndex || end $newEventIndex");
+        if (newEventIndex >= eventList.length) newEventIndex = eventList.length - 1;
+        print("start $oldEventIndex || end $newEventIndex");
 
-      eventList[newEventIndex]
-          .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
-      eventList[oldEventIndex].removeAt(index);
-    }
-  } else {
-    if (dragDetails.offset.dx - itemPosition.left < -200) {
-      print("left");
-      newEventIndex = resID - (((dragDetails.offset.dx - itemPosition.left).abs()) / 230).round();
+        eventList[newEventIndex]
+            .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
+        eventList[oldEventIndex].removeAt(index);
+      }
+    } else {
+      print(dragDetails.offset.dx - scrollcontroller.offset - itemPosition.left);
+      print("=-=-=-=-=");
+      if (dragDetails.offset.dx - scrollcontroller.offset - itemPosition.left < -200 + 240) {
+        print("left");
+        newEventIndex =
+            resID - (((dragDetails.offset.dx - 240 - itemPosition.left + scrollcontroller.offset).abs()) / 230).round();
 
-      if (newEventIndex < 0) newEventIndex = 0;
+        if (newEventIndex < 0) newEventIndex = 0;
 
-      print("start $oldEventIndex || end $newEventIndex");
+        print("start $oldEventIndex || end $newEventIndex");
 
-      eventList[newEventIndex]
-          .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
-      eventList[oldEventIndex].removeAt(index);
+        eventList[newEventIndex]
+            .add(new Event(startMinuteOfDay: event.startMinuteOfDay, duration: event.duration, title: event.title));
+        eventList[oldEventIndex].removeAt(index);
+      }
     }
   }
 }

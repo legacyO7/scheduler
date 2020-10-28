@@ -19,6 +19,7 @@ class Event {
 }
 
 int resID = 0;
+double columnWidth=0;
 
 List<List> eventList = <List>[
   <Event>[
@@ -234,11 +235,11 @@ class _DayViewExampleState extends State<DayViewExample> {
 
   _onTapDown(TapDownDetails details) {
     var x = details.localPosition.dx;
-    print("Resourse number= ${(x / 1)}");
-    print("Resourse number= ${((details.localPosition.dx - 60) / 230)}");
+ //   print( (DayViewEssentials().widths.timeIndicationAreaWidth + DayViewEssentials().widths.mainAreaStartPadding));
+      print("Resourse number= ${((details.localPosition.dx - 60) / columnWidth).floor()}");
     setState(() {
       resID = ((x -
-          (DayViewEssentials().widths.timeIndicationAreaWidth + DayViewEssentials().widths.mainAreaStartPadding)) / 230)
+          (DayViewEssentials().widths.timeIndicationAreaWidth)) / columnWidth)
           .floor();
     });
   }
@@ -354,6 +355,7 @@ class _DayViewExampleState extends State<DayViewExample> {
       ItemPosition itemPosition,
       ItemSize itemSize,
       int minuteOfDay,) {
+
     return new Positioned(
       top: itemPosition.top,
       left: itemPosition.left,
@@ -370,10 +372,12 @@ class _DayViewExampleState extends State<DayViewExample> {
     );
   }
 
+
   Positioned _generatedSupportLineBuilder(BuildContext context,
       ItemPosition itemPosition,
       double itemWidth,
       int minuteOfDay,) {
+    columnWidth= itemWidth/eventList.length;
     return Positioned(
         top: itemPosition.top,
         left: itemPosition.left,
@@ -384,7 +388,6 @@ class _DayViewExampleState extends State<DayViewExample> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Expanded(
                   flex: 0,
                   child: new Container(
@@ -485,14 +488,14 @@ class _DayViewExampleState extends State<DayViewExample> {
                     flex: 0,
                     child: GestureDetector(
                         onVerticalDragUpdate: (details) {
-                          if (details.delta.dy < -3) {
+                        if (details.delta.dy < -5) {
                             print("swipe top up");
                             if (event.startMinuteOfDay > 0)
                               setState(() {
                                 event.startMinuteOfDay = event.startMinuteOfDay - 30;
                                 event.duration = event.duration + 30;
                               });
-                          } else if (details.delta.dy > 3) {
+                          } else if (details.delta.dy > 5) {
                             print("swipe top down");
                             if (event.duration > 30)
                               setState(() {
@@ -588,7 +591,7 @@ class _DayViewExampleState extends State<DayViewExample> {
       print("Right");
       if (dragDetails.offset.dx - itemPosition.left + scrollcontroller.offset > 200) {
         newEventIndex =
-            ((dragDetails.offset.dx - 240 - itemPosition.left + scrollcontroller.offset) / 230).round() + resID;
+            ((dragDetails.offset.dx - 240 - itemPosition.left + scrollcontroller.offset) / columnWidth).round() + resID;
 
         if (newEventIndex >= eventList.length) newEventIndex = eventList.length - 1;
         print("start $oldEventIndex || end $newEventIndex");
@@ -603,7 +606,7 @@ class _DayViewExampleState extends State<DayViewExample> {
       if (dragDetails.offset.dx - scrollcontroller.offset - itemPosition.left < -200 + 240) {
         print("left");
         newEventIndex =
-            resID - (((dragDetails.offset.dx - 240 - itemPosition.left + scrollcontroller.offset).abs()) / 230).round();
+            resID - (((dragDetails.offset.dx - 240 - itemPosition.left + scrollcontroller.offset).abs()) / columnWidth).round();
 
         if (newEventIndex < 0) newEventIndex = 0;
 

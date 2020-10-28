@@ -288,6 +288,10 @@ class _DayViewExampleState extends State<DayViewExample> {
                                           behavior: HitTestBehavior.translucent,
                                           onTap: () => print("tapped"),
                                           onTapDown: (TapDownDetails details) => _onTapDown(details),
+
+                                          onPanStart: (DragStartDetails d){
+                                         
+                                          },
                                           child: DayViewSchedule(
                                             heightPerMinute: 1,
                                             components: <ScheduleComponent>[
@@ -471,78 +475,88 @@ class _DayViewExampleState extends State<DayViewExample> {
         height: itemSize.height,
         child: Container(
           child: Draggable(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  flex: 0,
-                  child: GestureDetector(
-                      onVerticalDragUpdate: (details) {
-                        if (details.delta.dy < -3) {
-                          print("swipe top up");
-                          if (event.startMinuteOfDay > 0)
-                            setState(() {
-                              event.startMinuteOfDay = event.startMinuteOfDay - 30;
-                              event.duration = event.duration + 30;
-                            });
-                        } else if (details.delta.dy > 3) {
-                          print("swipe top down");
-                          if (event.duration > 30)
-                            setState(() {
-                              event.startMinuteOfDay = event.startMinuteOfDay + 30;
-                              event.duration = event.duration - 30;
-                            });
-                        }
-                      },
-                      child: Container(
-                        height: 10,
-                        width: itemSize.width,
-                        color: Colors.green,
-                      )),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                      onLongPress: () {
-                        showAlertDialog(context, event.startMinuteOfDay, event.title, event.duration, index, resID);
-                      },
-                      child: Container(
-                          padding: EdgeInsets.all(3),
-                          color: Colors.red[200],
-                          margin: EdgeInsets.all(1),
-                          child: Text(("${event.title}")))),
-                  flex: 1,
-                ),
-                Expanded(
+            child: DragTarget(builder: (BuildContext context, List<dynamic> candidateData, List<dynamic> rejectedData) {
+              return Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
                     flex: 0,
-                    child: Draggable(
-                      child: GestureDetector(
-                          onVerticalDragUpdate: (details) {
-                            print(details.delta.dx);
-                            if (details.delta.dy < -3) {
-                              print("swipe bottom up");
-                              if (event.duration > 30)
-                                setState(() {
-                                  event.duration = event.duration - 30;
-                                });
-                            } else if (details.delta.dy > 3) {
-                              print("swipe bottom down");
-                              if (event.startMinuteOfDay + event.duration <= 1380)
-                                setState(() {
-                                  event.duration = event.duration + 30;
-                                });
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.only(bottom: 10),
-                            width: itemSize.width,
-                            color: Colors.green,
-                          )),
-                      feedback: Container(),
-                    )),
-              ],
-            ),
+                    child: GestureDetector(
+                        onVerticalDragUpdate: (details) {
+                          if (details.delta.dy < -3) {
+                            print("swipe top up");
+                            if (event.startMinuteOfDay > 0)
+                              setState(() {
+                                event.startMinuteOfDay = event.startMinuteOfDay - 30;
+                                event.duration = event.duration + 30;
+                              });
+                          } else if (details.delta.dy > 3) {
+                            print("swipe top down");
+                            if (event.duration > 30)
+                              setState(() {
+                                event.startMinuteOfDay = event.startMinuteOfDay + 30;
+                                event.duration = event.duration - 30;
+                              });
+                          }
+                        },
+                        child: Container(
+                          height: 10,
+                          width: itemSize.width,
+                          color: Colors.green,
+                        )),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                        onLongPress: () {
+                          showAlertDialog(context, event.startMinuteOfDay, event.title, event.duration, index, resID);
+                        },
+                        child: Container(
+
+                            color: Colors.red[200],
+
+                            child: Text(("${event.title}")))),
+                    flex: 1,
+                  ),
+                  Expanded(
+                      flex: 0,
+                      child: Draggable(
+                        child: GestureDetector(
+                            onVerticalDragUpdate: (details) {
+                              print(details.delta.dx);
+                              if (details.delta.dy < -3) {
+                                print("swipe bottom up");
+                                if (event.duration > 30)
+                                  setState(() {
+                                    event.duration = event.duration - 30;
+                                  });
+                              } else if (details.delta.dy > 3) {
+                                print("swipe bottom down");
+                                if (event.startMinuteOfDay + event.duration <= 1380)
+                                  setState(() {
+                                    event.duration = event.duration + 30;
+                                  });
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.only(bottom: 10),
+                              width: itemSize.width,
+                              color: Colors.green,
+                            )),
+                        feedback: Container(),
+                      )),
+                ],
+              );
+            },
+                onWillAccept: (data) {
+                  return true;
+                },
+                onAccept: (Event event) {
+                  print("OA");
+                  print(event.title);
+                  event.startMinuteOfDay = itemPosition.top.round();
+                },),
             feedback: Container(
               height: itemSize.height,
               width: itemSize.width,
@@ -552,6 +566,7 @@ class _DayViewExampleState extends State<DayViewExample> {
             ),
             data: event,
             childWhenDragging: Container(),
+
             onDragEnd: (dragDetails) {
               setState(() {
                 _x = dragDetails.offset.dx;
